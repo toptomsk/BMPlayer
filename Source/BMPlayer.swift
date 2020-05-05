@@ -17,7 +17,7 @@ public protocol BMPlayerDelegate : class {
     func bmPlayer(player: BMPlayer, playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval)
     func bmPlayer(player: BMPlayer, playerIsPlaying playing: Bool)
     func bmPlayer(player: BMPlayer, playerOrientChanged isFullscreen: Bool)
-    func playerDidFullscreen(_ player: BMPlayer)
+    @objc optional func playerDidFullscreen(_ player: BMPlayer)
 }
 
 /**
@@ -80,7 +80,11 @@ open class BMPlayer: UIView {
     
     fileprivate var customControlView: BMPlayerControlView?
     
-    public var isFullScreen: Bool = false
+    fileprivate var isFullScreen:Bool {
+        get {
+            return UIApplication.shared.statusBarOrientation.isLandscape
+        }
+    }
     
     /// 滑动方向
     fileprivate var panDirection = BMPanDirection.horizontal
@@ -516,6 +520,14 @@ extension BMPlayer: BMPlayerControlViewDelegate {
                           didPressButton button: UIButton) {
         if let action = BMPlayerControlView.ButtonType(rawValue: button.tag) {
             switch action {
+            case .back:
+                backBlock?(isFullScreen)
+                if isFullScreen {
+                    fullScreenButtonPressed()
+                } else {
+                    playerLayer?.prepareToDeinit()
+                }
+                
             case .play:
                 if button.isSelected {
                     pause()
@@ -534,6 +546,10 @@ extension BMPlayer: BMPlayerControlViewDelegate {
                 isPlayToTheEnd = false
                 seek(0)
                 play()
+                
+            case .fullscreen:
+                fullScreenButtonPressed()
+                
             default:
                 print("[Error] unhandled Action")
             }
