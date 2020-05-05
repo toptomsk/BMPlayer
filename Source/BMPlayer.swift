@@ -17,6 +17,7 @@ public protocol BMPlayerDelegate : class {
     func bmPlayer(player: BMPlayer, playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval)
     func bmPlayer(player: BMPlayer, playerIsPlaying playing: Bool)
     func bmPlayer(player: BMPlayer, playerOrientChanged isFullscreen: Bool)
+    func bmPlayer(player: BMPlayer, didFullscreenClicked isFullScreen: Bool)
 }
 
 /**
@@ -31,7 +32,7 @@ enum BMPanDirection: Int {
 }
 
 open class BMPlayer: UIView {
-    
+    open var fullScreen = false
     open weak var delegate: BMPlayerDelegate?
     
     open var backBlock:((Bool) -> Void)?
@@ -331,19 +332,21 @@ open class BMPlayer: UIView {
     }
     
     @objc open func onOrientationChanged() {
-        self.updateUI(isFullScreen)
-        delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
-        playOrientChanged?(isFullScreen)
+//        self.updateUI(isFullScreen)
+//        delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
+//        playOrientChanged?(isFullScreen)
     }
     
     @objc fileprivate func fullScreenButtonPressed() {
-        controlView.updateUI(!self.isFullScreen)
-        if isFullScreen {
-            UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
-        } else {
-            UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
-        }
-        print("fullscreen video: \(isFullScreen)")
+        controlView.fullscreenButton.isSelected = !controlView.fullscreenButton.isSelected
+        fullScreen = !fullScreen
+        delegate?.bmPlayer(player: self, didFullscreenClicked: fullScreen)
+//        controlView.updateUI(!self.isFullScreen)
+//        if isFullScreen {
+//            UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
+//        } else {
+//            UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
+//        }
     }
     
     // MARK: - 生命周期
