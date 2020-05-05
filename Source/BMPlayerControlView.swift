@@ -75,7 +75,6 @@ open class BMPlayerControlView: UIView {
     
     /// top views
     open var topWrapperView = UIView()
-    open var backButton = UIButton(type : UIButton.ButtonType.custom)
     open var titleLabel = UILabel()
     open var chooseDefinitionView = UIView()
     
@@ -233,9 +232,7 @@ open class BMPlayerControlView: UIView {
     open func controlViewAnimation(isShow: Bool) {
         let alpha: CGFloat = isShow ? 1.0 : 0.0
         self.isMaskShowing = isShow
-        
-        UIApplication.shared.setStatusBarHidden(!isShow, with: .fade)
-        
+                
         UIView.animate(withDuration: 0.3, animations: {[weak self] in
           guard let wSelf = self else { return }
           wSelf.topMaskView.alpha    = alpha
@@ -355,7 +352,7 @@ open class BMPlayerControlView: UIView {
             chooseDefinitionView.addSubview(button)
             button.addTarget(self, action: #selector(self.onDefinitionSelected(_:)), for: UIControl.Event.touchUpInside)
             button.snp.makeConstraints({ [weak self](make) in
-                guard let `self` = self else { return }
+                guard let _ = self else { return }
                 make.top.equalTo(chooseDefinitionView.snp.top).offset(35 * i)
                 make.width.equalTo(50)
                 make.height.equalTo(25)
@@ -396,9 +393,7 @@ open class BMPlayerControlView: UIView {
     //Button fullscreen clicked
     @objc open func fullScreenDidPress() {
         guard let playerView = player else { return }
-        playerView.videoGravity = videoGravityButton.isSelected ? .resizeAspectFill : .resizeAspect
-        videoGravityButton.isSelected = !videoGravityButton.isSelected
-        playerView.delegate?.playerDidFullscreen?(player)
+        playerView.delegate?.playerDidFullscreen(playerView)
     }
     
     /**
@@ -521,13 +516,8 @@ open class BMPlayerControlView: UIView {
         
         // Top views
         topMaskView.addSubview(topWrapperView)
-        topWrapperView.addSubview(backButton)
         topWrapperView.addSubview(titleLabel)
         topWrapperView.addSubview(chooseDefinitionView)
-        
-        backButton.tag = BMPlayerControlView.ButtonType.back.rawValue
-        backButton.setImage(BMImageResourcePath("Pod_Asset_BMPlayer_back"), for: .normal)
-        backButton.addTarget(self, action: #selector(onButtonPressed(_:)), for: .touchUpInside)
         
         titleLabel.textColor = UIColor.white
         titleLabel.text      = ""
@@ -662,14 +652,10 @@ open class BMPlayerControlView: UIView {
         }
         
         // Top views
-        backButton.snp.makeConstraints { (make) in
-          make.width.height.equalTo(50)
-          make.left.bottom.equalToSuperview()
-        }
         
-        titleLabel.snp.makeConstraints { [unowned self](make) in
-            make.left.equalTo(self.backButton.snp.right)
-            make.centerY.equalTo(self.backButton)
+        titleLabel.snp.makeConstraints { (make) in
+            make.left.equalToSuperview().offset(20)
+            make.height.equalTo(50)
         }
         
         chooseDefinitionView.snp.makeConstraints { [unowned self](make) in
