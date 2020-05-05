@@ -393,6 +393,13 @@ open class BMPlayerControlView: UIView {
       }
       delegate?.controlView(controlView: self, didPressButton: button)
     }
+    //Button fullscreen clicked
+    @objc open func fullScreenDidPress() {
+        guard let playerView = player else { return }
+        playerView.videoGravity = videoGravityButton.isSelected ? .resizeAspectFill : .resizeAspect
+        videoGravityButton.isSelected = !videoGravityButton.isSelected
+        playerView.delegate?.playerDidFullscreen?(player)
+    }
     
     /**
      Call when the tap gesture tapped
@@ -576,7 +583,7 @@ open class BMPlayerControlView: UIView {
         fullscreenButton.tag = BMPlayerControlView.ButtonType.fullscreen.rawValue
         fullscreenButton.setImage(BMImageResourcePath("Pod_Asset_BMPlayer_fullscreen"),    for: .normal)
         fullscreenButton.setImage(BMImageResourcePath("Pod_Asset_BMPlayer_portialscreen"), for: .selected)
-        fullscreenButton.addTarget(self, action: #selector(onButtonPressed(_:)), for: .touchUpInside)
+        fullscreenButton.addTarget(self, action: #selector(fullScreenDidPress), for: .touchUpInside)
         
         mainMaskView.addSubview(loadingIndicator)
         

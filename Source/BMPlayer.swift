@@ -17,6 +17,7 @@ public protocol BMPlayerDelegate : class {
     func bmPlayer(player: BMPlayer, playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval)
     func bmPlayer(player: BMPlayer, playerIsPlaying playing: Bool)
     func bmPlayer(player: BMPlayer, playerOrientChanged isFullscreen: Bool)
+    @objc optional func playerDidFullscreen(_ player: BMPlayer)
 }
 
 /**
@@ -330,21 +331,31 @@ open class BMPlayer: UIView {
         }
     }
     
-    @objc open func onOrientationChanged() {
-        self.updateUI(isFullScreen)
-        delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
-        playOrientChanged?(isFullScreen)
+    @objc fileprivate func orientationDidChange() {
+
+        switch UIDevice.current.orientation {
+        case .landscapeLeft, .landscapeRight: fullScreenButton(isSelected: true)
+        case .portrait, .portraitUpsideDown: fullScreenButton(isSelected: false)
+        default: break
+        }
+    }
+
+    fileprivate func fullScreenButton(isSelected: Bool) {
+
+        if controlView != nil {
+
+        }
     }
     
-    @objc fileprivate func fullScreenButtonPressed() {
-        controlView.updateUI(!self.isFullScreen)
-        if isFullScreen {
-            UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
-        } else {
-            UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
-        }
-        print("fullscreen video: \(isFullScreen)")
-    }
+//    @objc fileprivate func fullScreenButtonPressed() {
+//        controlView.updateUI(!self.isFullScreen)
+//        if isFullScreen {
+//            UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
+//        } else {
+//            UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
+//        }
+//        print("fullscreen video: \(isFullScreen)")
+//    }
     
     // MARK: - 生命周期
     deinit {
@@ -406,7 +417,7 @@ open class BMPlayer: UIView {
     }
     
     fileprivate func initUIData() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.orientationDidChange), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     fileprivate func configureVolume() {
