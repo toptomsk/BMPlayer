@@ -343,6 +343,7 @@ open class BMPlayer: UIView {
         } else {
             UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
         }
+        print("fullscreen video: \(isFullScreen)")
     }
     
     // MARK: - 生命周期
