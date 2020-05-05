@@ -81,7 +81,7 @@ open class BMPlayer: UIView {
     
     fileprivate var isFullScreen:Bool {
         get {
-            return UIApplication.shared.statusBarOrientation.isLandscape
+            return UIDevice.current.orientation.isLandscape
         }
     }
     
