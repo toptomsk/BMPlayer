@@ -79,7 +79,11 @@ open class BMPlayer: UIView {
     
     fileprivate var customControlView: BMPlayerControlView?
     
-    fileprivate var isFullScreen:Bool = false
+    fileprivate var isFullScreen:Bool {
+        get {
+            return UIApplication.shared.statusBarOrientation.isLandscape
+        }
+    }
     
     /// 滑动方向
     fileprivate var panDirection = BMPanDirection.horizontal
@@ -327,9 +331,9 @@ open class BMPlayer: UIView {
     }
     
     @objc open func onOrientationChanged() {
-//        self.updateUI(isFullScreen)
+        self.updateUI(isFullScreen)
         delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
-//        playOrientChanged?(isFullScreen)
+        playOrientChanged?(isFullScreen)
     }
     
     @objc fileprivate func fullScreenButtonPressed() {
