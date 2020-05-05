@@ -17,6 +17,7 @@ public protocol BMPlayerDelegate : class {
     func bmPlayer(player: BMPlayer, playTimeDidChange currentTime : TimeInterval, totalTime: TimeInterval)
     func bmPlayer(player: BMPlayer, playerIsPlaying playing: Bool)
     func bmPlayer(player: BMPlayer, playerOrientChanged isFullscreen: Bool)
+    func bmPlayer(player: BMPlayer, didFullscreenClicked isFullScreen: Bool)
 }
 
 /**
@@ -31,7 +32,7 @@ enum BMPanDirection: Int {
 }
 
 open class BMPlayer: UIView {
-    
+    open var fullScreen = false
     open weak var delegate: BMPlayerDelegate?
     
     open var backBlock:((Bool) -> Void)?
@@ -75,7 +76,7 @@ open class BMPlayer: UIView {
     
     fileprivate var currentDefinition = 0
     
-    fileprivate var controlView: BMPlayerControlView!
+    open var controlView: BMPlayerControlView!
     
     fileprivate var customControlView: BMPlayerControlView?
     
@@ -331,25 +332,28 @@ open class BMPlayer: UIView {
     }
     
     @objc open func onOrientationChanged() {
-        self.updateUI(isFullScreen)
-        delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
-        playOrientChanged?(isFullScreen)
+//        self.updateUI(isFullScreen)
+//        delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
+//        playOrientChanged?(isFullScreen)
     }
     
     @objc fileprivate func fullScreenButtonPressed() {
-        controlView.updateUI(!self.isFullScreen)
-        if isFullScreen {
-            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
-        } else {
-            UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
-        }
+        controlView.fullscreenButton.isSelected = !controlView.fullscreenButton.isSelected
+        fullScreen = !fullScreen
+        delegate?.bmPlayer(player: self, didFullscreenClicked: fullScreen)
+//        controlView.updateUI(!self.isFullScreen)
+//        if isFullScreen {
+//            UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
+//        } else {
+//            UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
+//        }
     }
     
     // MARK: - 生命周期
     deinit {
         playerLayer?.pause()
         playerLayer?.prepareToDeinit()
-        NotificationCenter.default.removeObserver(self, name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     
@@ -405,7 +409,7 @@ open class BMPlayer: UIView {
     }
     
     fileprivate func initUIData() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChanged), name: UIApplication.didChangeStatusBarOrientationNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onOrientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     
     fileprivate func configureVolume() {
