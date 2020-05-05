@@ -75,7 +75,7 @@ open class BMPlayer: UIView {
     
     fileprivate var currentDefinition = 0
     
-    fileprivate var controlView: BMPlayerControlView!
+    open var controlView: BMPlayerControlView!
     
     fileprivate var customControlView: BMPlayerControlView?
     
