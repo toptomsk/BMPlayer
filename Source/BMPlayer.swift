@@ -331,19 +331,30 @@ open class BMPlayer: UIView {
     }
     
     @objc open func onOrientationChanged() {
-        self.updateUI(isFullScreen)
-        delegate?.bmPlayer(player: self, playerOrientChanged: isFullScreen)
-        playOrientChanged?(isFullScreen)
+        var fullScreen = false
+        if controlView.fullscreenButton.isSelected {
+            fullScreen = false
+        } else {
+            fullScreen = true
+        }
+        self.updateUI(fullScreen)
+        delegate?.bmPlayer(player: self, playerOrientChanged: fullScreen)
+        playOrientChanged?(fullScreen)
     }
     
     @objc fileprivate func fullScreenButtonPressed() {
-        controlView.updateUI(!self.isFullScreen)
-        if isFullScreen {
+        var fullScreen = false
+        if controlView.fullscreenButton.isSelected {
+            fullScreen = false
+        } else {
+            fullScreen = true
+        }
+        controlView.updateUI(fullScreen)
+        if fullScreen {
             UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
         } else {
             UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
         }
-        print("fullscreen video: \(isFullScreen)")
     }
     
     // MARK: - 生命周期
