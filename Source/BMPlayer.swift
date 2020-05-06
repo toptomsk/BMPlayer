@@ -79,15 +79,7 @@ open class BMPlayer: UIView {
     
     fileprivate var customControlView: BMPlayerControlView?
     
-    fileprivate var isFullScreen:Bool = {
-        get {
-            switch UIDevice.current.orientation {
-                case .landscapeLeft, .landscapeRight: return true
-                case .portrait, .portraitUpsideDown: return false
-                default: return false
-            }
-        }
-    }
+    fileprivate var isFullScreen:Bool = false
     
     /// 滑动方向
     fileprivate var panDirection = BMPanDirection.horizontal
@@ -345,6 +337,7 @@ open class BMPlayer: UIView {
         } else {
             UIDevice.current.setValue(UIDeviceOrientation.landscapeRight.rawValue, forKey: "orientation")
         }
+        isFullScreen = !isFullScreen
     }
     
     // MARK: - 生命周期
